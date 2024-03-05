@@ -4,6 +4,7 @@ import FormData from 'form-data';
 import sharp from 'sharp';
 
 dotenv.config();
+
 const network = process.env.NETWORK;
 const nftContract = network == 'testnet' ? process.env.NFT_CONTRACT_TESTNET : process.env.NFT_CONTRACT_MAINNET;
 const minter = network == 'testnet' ? process.env.MINTER_TESTNET : process.env.MINTER_MAINNET;
