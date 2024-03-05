@@ -20,6 +20,8 @@ const nftContract = network == 'testnet' ? process.env.NFT_CONTRACT_TESTNET : pr
 const minter = network == 'testnet' ? process.env.MINTER_TESTNET : process.env.MINTER_MAINNET;
 const mintbaseWalletUrl = network == 'testnet' ? process.env.MINTBASE_WALLET_TESTNET : process.env.MINTBASE_WALLET_MAINNET;
 
+app.get("/", (req, res) => res.send("Express on Vercel"));
+
 app.post('/get-image', async (req, res) => {
     return await openai.images.generate({ 
         prompt: req.body.description, 
