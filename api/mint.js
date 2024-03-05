@@ -4,7 +4,6 @@ import FormData from 'form-data';
 import sharp from 'sharp';
 
 dotenv.config();
-
 const network = process.env.NETWORK;
 const nftContract = network == 'testnet' ? process.env.NFT_CONTRACT_TESTNET : process.env.NFT_CONTRACT_MAINNET;
 const minter = network == 'testnet' ? process.env.MINTER_TESTNET : process.env.MINTER_MAINNET;
@@ -29,6 +28,7 @@ export default async (req, res) => {
     }
 };
 
+
 async function resizeImageFromUrlToBase64(imageUrl, width = 512) {
     try {
       const response = await fetch(imageUrl);
@@ -49,6 +49,7 @@ async function resizeImageFromUrlToBase64(imageUrl, width = 512) {
       throw error;
     }
 }
+
 
 async function uploadToArweave(base64Image) {
     const base64Data = base64Image.split(';base64,').pop();
@@ -81,7 +82,6 @@ async function uploadToArweave(base64Image) {
       }
   }
   
-
 function constructSignUrl(arweaveId, name, description, redirectUrl) {
 
     const transactionsData = [{
