@@ -35,6 +35,21 @@ app.post('/get-image', async (req, res) => {
 
 });
 
+app.post('/mint', async (req, res) => {
+
+    let imageUrl = req.body.imageUrl;
+    let imageBase64 = await resizeImageFromUrlToBase64(imageUrl);
+    let uploadResult = await uploadToArweave(imageBase64);
+    let arweaveId = uploadResult.id;
+    let name = req.body.name;
+    let description = req.body.description;
+    let redirectUrl = req.body.redirectUrl;
+    
+    let url = constructSignUrl(arweaveId, name, description, redirectUrl);
+
+    res.json({ signUrl: url });
+});
+
 async function resizeImageFromUrlToBase64(imageUrl, width = 512) {
     try {
       const response = await fetch(imageUrl);
@@ -54,24 +69,7 @@ async function resizeImageFromUrlToBase64(imageUrl, width = 512) {
       console.error('Error resizing image from URL:', error);
       throw error;
     }
-  }
-
-  
-app.post('/mint', async (req, res) => {
-
-    let imageUrl = req.body.imageUrl;
-    let imageBase64 = await resizeImageFromUrlToBase64(imageUrl);
-    let uploadResult = await uploadToArweave(imageBase64);
-    let arweaveId = uploadResult.id;
-    let name = req.body.name;
-    let description = req.body.description;
-    let redirectUrl = req.body.redirectUrl;
-    
-    let url = constructSignUrl(arweaveId, name, description, redirectUrl);
-
-    res.json({ signUrl: url });
-});
-
+}
 
 async function uploadToArweave(base64Image) {
     const base64Data = base64Image.split(';base64,').pop();
