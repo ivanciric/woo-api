@@ -83,11 +83,11 @@ async function uploadToArweave(base64Image) {
     });
 
     try {
-        const response = await fetch('https://ar.mintbase.xyz/reference', {
+        const response = await fetch(process.env.ARWEAVE_UPLOAD_URL, {
           method: 'POST',
           body: formData,
           headers: {
-            'Mb-Api-Key': 'anon',
+            'Mb-Api-Key': process.env.ARWEAVE_UPLOAD_API_KEY,
             ...formData.getHeaders()
           }
         });
