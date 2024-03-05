@@ -10,6 +10,7 @@ const nftContract = network == 'testnet' ? process.env.NFT_CONTRACT_TESTNET : pr
 const minter = network == 'testnet' ? process.env.MINTER_TESTNET : process.env.MINTER_MAINNET;
 const mintbaseWalletUrl = network == 'testnet' ? process.env.MINTBASE_WALLET_TESTNET : process.env.MINTBASE_WALLET_MAINNET;
 
+
 export default async (req, res) => {
     if (req.method === 'POST') {
         try {
