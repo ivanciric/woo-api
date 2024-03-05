@@ -1,56 +1,28 @@
-import express from 'express';
-import cors from 'cors';
 import dotenv from 'dotenv';
-import OpenAI from "openai";
-import sharp from 'sharp';
 import fetch from 'node-fetch';
 import FormData from 'form-data';
+import sharp from 'sharp';
 
 dotenv.config();
-const app = express();
-app.use(express.json());
-app.use(cors());
 
-const network = process.env.NETWORK;
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
-});
-
-const nftContract = network == 'testnet' ? process.env.NFT_CONTRACT_TESTNET : process.env.NFT_CONTRACT_MAINNET;
-const minter = network == 'testnet' ? process.env.MINTER_TESTNET : process.env.MINTER_MAINNET;
-const mintbaseWalletUrl = network == 'testnet' ? process.env.MINTBASE_WALLET_TESTNET : process.env.MINTBASE_WALLET_MAINNET;
-
-app.get("/", (req, res) => res.send("Express on Vercel"));
-
-app.post('/get-image', async (req, res) => {
-    return await openai.images.generate({ 
-        prompt: req.body.description, 
-        size: '1024x1024',
-        model: 'dall-e-3',
-        style: 'vivid',
-        response_format: 'url'
-     })
-     .then((response) => {
-        let image = response.data[0].url;
-        res.json({ imageUrl: image });
-     });
-
-});
-
-app.post('/mint', async (req, res) => {
-
-    let imageUrl = req.body.imageUrl;
-    let imageBase64 = await resizeImageFromUrlToBase64(imageUrl);
-    let uploadResult = await uploadToArweave(imageBase64);
-    let arweaveId = uploadResult.id;
-    let name = req.body.name;
-    let description = req.body.description;
-    let redirectUrl = req.body.redirectUrl;
-    
-    let url = constructSignUrl(arweaveId, name, description, redirectUrl);
-
-    res.json({ signUrl: url });
-});
+export default async (req, res) => {
+    if (req.method === 'POST') {
+        try {
+            let { imageUrl, name, description, redirectUrl } = req.body;
+            let imageBase64 = await resizeImageFromUrlToBase64(imageUrl);
+            let uploadResult = await uploadToArweave(imageBase64); 
+            let arweaveId = uploadResult.id;
+            let url = constructSignUrl(arweaveId, name, description, redirectUrl); 
+            res.status(200).json({ signUrl: url });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Error in minting process' });
+        }
+    } else {
+        res.setHeader('Allow', ['POST']);
+        res.status(405).end(`Method ${req.method} Not Allowed`);
+    }
+};
 
 async function resizeImageFromUrlToBase64(imageUrl, width = 512) {
     try {
@@ -132,8 +104,3 @@ function constructSignUrl(arweaveId, name, description, redirectUrl) {
     
     return mintbaseSignTransactionUrl;
 }
-
-const PORT = process.env.PORT;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-module.exports = app;

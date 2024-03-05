@@ -2,14 +2,22 @@
     "version": 2,
     "builds": [
       {
-        "src": "index.js",
-        "use": "@now/node"
+        "src": "/api/**/*.js",
+        "use": "@vercel/node"
       }
     ],
     "routes": [
       {
-        "src": "/(.*)",
-        "dest": "index.js"
+        "src": "/api/(.*)",
+        "dest": "/api/$1.js"
       }
-    ]
-}
+    ],
+    "functions": {
+      "api/**/*.js": {
+        "runtime": "nodejs20.x",
+        "memory": 3008,
+        "maxDuration": 10
+      }
+    }
+  }
+  
