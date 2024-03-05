@@ -5,11 +5,11 @@ import sharp from 'sharp';
 
 dotenv.config();
 
+// assign everything to the process.env object
 const network = process.env.NETWORK;
 const nftContract = network == 'testnet' ? process.env.NFT_CONTRACT_TESTNET : process.env.NFT_CONTRACT_MAINNET;
 const minter = network == 'testnet' ? process.env.MINTER_TESTNET : process.env.MINTER_MAINNET;
 const mintbaseWalletUrl = network == 'testnet' ? process.env.MINTBASE_WALLET_TESTNET : process.env.MINTBASE_WALLET_MAINNET;
-
 
 export default async (req, res) => {
     if (req.method === 'POST') {
