@@ -8,6 +8,15 @@ const openai = new OpenAI({
 });
 
 export default async (req, res) => {
+
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+
     if (req.method === 'POST') {
         try {
             const response = await openai.images.generate({
@@ -29,3 +38,5 @@ export default async (req, res) => {
         res.status(405).end(`Method ${req.method} Not Allowed`);
     }
 };
+
+module.exports = app;
