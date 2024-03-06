@@ -7,6 +7,7 @@ const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY
 });
 
+export const maxDuration = 25;
 export default async (req, res) => {
 
     res.setHeader('Access-Control-Allow-Origin', '*');
