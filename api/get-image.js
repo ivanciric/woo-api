@@ -22,8 +22,8 @@ export default async (req, res) => {
         try {
             const response = await openai.images.generate({
                 prompt: req.body.description,
-                size: '1024x1024',
-                model: 'dall-e-3',
+                size: process.env.OPENAI_IMAGE_SIZE,
+                model: process.env.OPENAI_IMAGE_MODEL,
                 style: 'vivid',
                 response_format: 'url'
             });
