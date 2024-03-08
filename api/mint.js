@@ -22,11 +22,11 @@ export default async (req, res) => {
 
     if (req.method === 'POST') {
         try {
-            let { imageUrl, name, description, redirectUrl } = req.body;
+            let { imageUrl, name, description, redirectUrl, tokenId } = req.body;
             let imageBase64 = await resizeImageFromUrlToBase64(imageUrl);
             let uploadResult = await uploadToArweave(imageBase64); 
             let arweaveId = uploadResult.id;
-            let url = constructSignUrl(arweaveId, name, description, redirectUrl); 
+            let url = constructSignUrl(arweaveId, name, description, redirectUrl, tokenId); 
             res.status(200).json({ signUrl: url });
         } catch (error) {
             console.error(error);
@@ -92,9 +92,10 @@ async function uploadToArweave(base64Image) {
       }
   }
   
-function constructSignUrl(arweaveId, name, description, redirectUrl) {
+function constructSignUrl(arweaveId, name, description, redirectUrl, tokenId) {
 
     const transactionsData = [{
+        token_id: tokenId,
         receiverId: minter,
         signerId: "",
         actions: [{
