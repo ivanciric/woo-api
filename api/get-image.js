@@ -5,23 +5,27 @@ const openai = new OpenAI({
 });
 
 export const config = {
-    runtime: 'edge', 
+    runtime: 'experimental-edge',
 };
 
-export default async (req, res) => {
-
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
+export default async (request) => {
+    // Preflight request handling for CORS
+    if (request.method === 'OPTIONS') {
+        return new Response(null, {
+            status: 200,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'POST, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type',
+            },
+        });
     }
 
-    if (req.method === 'POST') {
+    if (request.method === 'POST') {
         try {
+            const reqBody = await request.json();
             const response = await openai.images.generate({
-                prompt: req.body.description,
+                prompt: reqBody.description,
                 size: process.env.OPENAI_IMAGE_SIZE,
                 model: process.env.OPENAI_IMAGE_MODEL,
                 style: 'vivid',
@@ -29,13 +33,27 @@ export default async (req, res) => {
             });
 
             let image = response.data[0].url;
-            res.json({ imageUrl: image });
+            return new Response(JSON.stringify({ imageUrl: image }), {
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Content-Type': 'application/json',
+                },
+            });
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: 'Error generating image' });
+            return new Response(JSON.stringify({ error: 'Error generating image' }), {
+                status: 500,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
         }
     } else {
-        res.setHeader('Allow', ['POST']);
-        res.status(405).end(`Method ${req.method} Not Allowed`);
+        return new Response(`Method ${request.method} Not Allowed`, {
+            status: 405,
+            headers: {
+                'Allow': ['POST'],
+            },
+        });
     }
 };
