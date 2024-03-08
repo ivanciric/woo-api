@@ -95,7 +95,6 @@ async function uploadToArweave(base64Image) {
 function constructSignUrl(arweaveId, name, description, redirectUrl, tokenId) {
 
     const transactionsData = [{
-        token_id: tokenId,
         receiverId: minter,
         signerId: "",
         actions: [{
@@ -104,8 +103,9 @@ function constructSignUrl(arweaveId, name, description, redirectUrl, tokenId) {
             methodName: "mint",
             args:
             {
-                "metadata": `{"reference":"${arweaveId}", "title": "${name}", "description": "${description}"}`,
-                "nft_contract_id": nftContract
+                "metadata": `{"reference":"${arweaveId}", "title": "${name}", "description": "${description}", "token_id": "${tokenId}"}`,
+                "nft_contract_id": nftContract,
+                "token_id": tokenId,
             },
             gas: "200000000000000",
             deposit: "10000000000000000000000"
