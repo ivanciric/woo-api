@@ -7,8 +7,7 @@ const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY
 });
 
-export const maxDuration = 30;
-export const dynamic = 'force-dynamic';
+export const runtime = 'edge';
 
 export default async (req, res) => {
 
