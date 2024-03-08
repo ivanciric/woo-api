@@ -8,6 +8,7 @@ const network = process.env.NETWORK;
 const nftContract = network == 'testnet' ? process.env.NFT_CONTRACT_TESTNET : process.env.NFT_CONTRACT_MAINNET;
 const minter = network == 'testnet' ? process.env.MINTER_TESTNET : process.env.MINTER_MAINNET;
 const mintbaseWalletUrl = network == 'testnet' ? process.env.MINTBASE_WALLET_TESTNET : process.env.MINTBASE_WALLET_MAINNET;
+const uploadUrl = network == 'testnet' ? process.env.MINTBASE_ARWEAVE_UPLOAD_URL_TESTNET : process.env.MINTBASE_ARWEAVE_UPLOAD_URL_MAINNET;
 
 export default async (req, res) => {
 
@@ -70,11 +71,11 @@ async function uploadToArweave(base64Image) {
     });
 
     try {
-        const response = await fetch(process.env.ARWEAVE_UPLOAD_URL, {
+        const response = await fetch(uploadUrl, {
           method: 'POST',
           body: formData,
           headers: {
-            'Mb-Api-Key': process.env.ARWEAVE_UPLOAD_API_KEY,
+            'Mb-Api-Key': process.env.MINTBASE_ARWEAVE_API_KEY,
             ...formData.getHeaders()
           }
         });
