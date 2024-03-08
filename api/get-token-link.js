@@ -23,8 +23,8 @@ export default async (req, res) => {
             let metadata = await getMetadataIdFromTokenId(tokenId); 
             console.log(metadata.data.nft_tokens[0].metadata_id)
             let metadataId = metadata.data.nft_tokens[0].metadata_id;
-            let url = `${mintbaseBaseUrl}/meta/${metadataId}`;
-            res.status(200).json({ nftUrl: encodeURIComponent(url) });
+            let url = `${mintbaseBaseUrl}/meta/${encodeURIComponent(metadataId)}`;
+            res.status(200).json({ nftUrl: url });
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: 'Error in minting process' });
