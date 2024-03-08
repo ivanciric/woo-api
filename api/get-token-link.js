@@ -21,8 +21,8 @@ export default async (req, res) => {
         try {
             let { tokenId } = req.body;
             let metadata = await getMetadataIdFromTokenId(tokenId); 
-            console.log(metadata.data.nft_tokens)
-            let metadataId = tokenId;
+            console.log(metadata.data.nft_tokens[0].metadata_id)
+            let metadataId = metadata.data.nft_tokens[0].metadata_id;
             let url = `${mintbaseBaseUrl}/meta/${nftContract}%3A${metadataId}`;
             res.status(200).json({ nftUrl: url });
         } catch (error) {
