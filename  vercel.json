@@ -11,13 +11,6 @@
         "src": "/api/(.*)",
         "dest": "/api/$1.js"
       }
-    ],
-    "functions": {
-      "api/**/*.js": {
-        "runtime": "nodejs20.x",
-        "memory": 3008,
-        "maxDuration": 25
-      }
-    }
+    ]
   }
   
