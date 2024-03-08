@@ -103,9 +103,9 @@ function constructSignUrl(arweaveId, name, description, redirectUrl, tokenId) {
             methodName: "mint",
             args:
             {
-                "metadata": `{"reference":"${arweaveId}", "title": "${name}", "description": "${description}", "token_id": "${tokenId}"}`,
+                "metadata": `{"reference":"${arweaveId}", "title": "WooNFT Art", "description": "${description}", "id": "${tokenId}"}`,
                 "nft_contract_id": nftContract,
-                "token_id": tokenId,
+                "id": tokenId,
             },
             gas: "200000000000000",
             deposit: "10000000000000000000000"
