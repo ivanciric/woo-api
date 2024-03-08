@@ -8,6 +8,8 @@ const openai = new OpenAI({
 });
 
 export const maxDuration = 30;
+export const dynamic = 'force-dynamic';
+
 export default async (req, res) => {
 
     res.setHeader('Access-Control-Allow-Origin', '*');
