@@ -26,8 +26,9 @@ export default async (req, res) => {
             let imageBase64 = await resizeImageFromUrlToBase64(imageUrl);
             let uploadResult = await uploadToArweave(imageBase64); 
             let arweaveId = uploadResult.id;
-            redirectUrl += `?network=${network}`;
-            let url = constructSignUrl(arweaveId, name, description, redirectUrl, tokenId); 
+            const originUrl = new URL(redirectUrl);
+            originUrl.searchParams.set('network', network);
+            let url = constructSignUrl(arweaveId, name, description, originUrl, tokenId); 
             res.status(200).json({ signUrl: url });
         } catch (error) {
             console.error(error);
