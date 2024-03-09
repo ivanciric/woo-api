@@ -26,6 +26,7 @@ export default async (req, res) => {
             let imageBase64 = await resizeImageFromUrlToBase64(imageUrl);
             let uploadResult = await uploadToArweave(imageBase64); 
             let arweaveId = uploadResult.id;
+            redirectUrl += `&network=${network}`;
             let url = constructSignUrl(arweaveId, name, description, redirectUrl, tokenId); 
             res.status(200).json({ signUrl: url });
         } catch (error) {
@@ -116,7 +117,7 @@ function constructSignUrl(arweaveId, name, description, redirectUrl, tokenId) {
     const callbackUrl = redirectUrl;
     const encodedTransactionsData = encodeURIComponent(JSON.stringify(transactionsData));
     const encodedCallbackUrl = encodeURIComponent(callbackUrl);
-    const mintbaseSignTransactionUrl = `${mintbaseWalletUrl}/sign-transaction?transactions_data=${encodedTransactionsData}&callback_url=${encodedCallbackUrl}&network=${network}`;
+    const mintbaseSignTransactionUrl = `${mintbaseWalletUrl}/sign-transaction?transactions_data=${encodedTransactionsData}&callback_url=${encodedCallbackUrl}`;
     
     return mintbaseSignTransactionUrl;
 }
