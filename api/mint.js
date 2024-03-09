@@ -103,7 +103,7 @@ function constructSignUrl(arweaveId, name, description, redirectUrl, tokenId) {
             methodName: "mint",
             args:
             {
-                "metadata": `{"reference":"${arweaveId}", "title": "WooNFT Art", "description": "${description}", "id": "${tokenId}"}`,
+                "metadata": `{"reference":"${arweaveId}", "title": "WooNFT Art", "description": "${description}"}`,
                 "nft_contract_id": nftContract,
                 "id": tokenId,
             },
@@ -116,7 +116,7 @@ function constructSignUrl(arweaveId, name, description, redirectUrl, tokenId) {
     const callbackUrl = redirectUrl;
     const encodedTransactionsData = encodeURIComponent(JSON.stringify(transactionsData));
     const encodedCallbackUrl = encodeURIComponent(callbackUrl);
-    const mintbaseSignTransactionUrl = `${mintbaseWalletUrl}/sign-transaction?transactions_data=${encodedTransactionsData}&callback_url=${encodedCallbackUrl}`;
+    const mintbaseSignTransactionUrl = `${mintbaseWalletUrl}/sign-transaction?transactions_data=${encodedTransactionsData}&callback_url=${encodedCallbackUrl}&network=${network}`;
     
     return mintbaseSignTransactionUrl;
 }
