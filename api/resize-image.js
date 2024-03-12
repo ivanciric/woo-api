@@ -4,7 +4,7 @@ import sharp from 'sharp';
 
 dotenv.config();
 
-const defaultWidth = process.env.RESIZE_WIDTH || 256;
+const defaultWidth = parseInt(process.env.RESIZE_WIDTH, 10) || 256;
 export default async (req, res) => {
 
     res.setHeader('Access-Control-Allow-Origin', 'woonft-api.yoshi.tech');

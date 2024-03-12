@@ -4,7 +4,7 @@ const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY
 });
 
-const defaultWidth = process.env.RESIZE_WIDTH || 256;
+const defaultWidth = parseInt(process.env.RESIZE_WIDTH, 10) || 256;
 
 export const config = {
     runtime: 'experimental-edge',
