@@ -32,12 +32,12 @@ export default async (request) => {
                 response_format: 'url'
             });
 
-            let image = response.data[0].url;
+            let imageUrl = response.data[0].url;
 
             if (reqBody.width) {
-                image = await resizeImageFromUrlToBase64(image, reqBody.width);
+                let resizedImage = await resizeImageFromUrlToBase64(imageUrl, reqBody.width);
             } else {
-                let resizedImage = await resizeImageFromUrlToBase64(image);
+                let resizedImage = await resizeImageFromUrlToBase64(imageUrl);
             };
             
             return new Response(JSON.stringify({ image: resizedImage }), {
