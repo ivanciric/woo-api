@@ -40,7 +40,7 @@ export default async (request) => {
                 let resizedImage = await resizeImageFromUrlToBase64(image);
             };
             
-            return new Response(JSON.stringify({ imageUrl: resizedImage }), {
+            return new Response(JSON.stringify({ image: resizedImage }), {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     'Content-Type': 'application/json',
