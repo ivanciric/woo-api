@@ -8,6 +8,7 @@ const nftContract = network == 'testnet' ? process.env.NFT_CONTRACT_TESTNET : pr
 const minter = network == 'testnet' ? process.env.MINTER_TESTNET : process.env.MINTER_MAINNET;
 const mintbaseWalletUrl = network == 'testnet' ? process.env.MINTBASE_WALLET_TESTNET : process.env.MINTBASE_WALLET_MAINNET;
 const uploadUrl = network == 'testnet' ? process.env.MINTBASE_ARWEAVE_UPLOAD_URL_TESTNET : process.env.MINTBASE_ARWEAVE_UPLOAD_URL_MAINNET;
+const defaultWidth = parseInt(process.env.RESIZE_WIDTH, 10) || 512;
 
 export default async (req, res) => {
 
@@ -22,7 +23,8 @@ export default async (req, res) => {
     if (req.method === 'POST') {
         try {
             let { image, name, description, redirectUrl, tokenId } = req.body;
-            let uploadResult = await uploadToArweave(image); 
+            let base64Image = await resizeImageFromUrlToBase64(image, 512);
+            let uploadResult = await uploadToArweave(base64Image); 
             let arweaveId = uploadResult.id;
             const originUrl = new URL(redirectUrl);
             originUrl.searchParams.set('network', network);
@@ -37,6 +39,31 @@ export default async (req, res) => {
         res.status(405).end(`Method ${req.method} Not Allowed`);
     }
 };
+
+async function resizeImageFromUrlToBase64(imageUrl, width = defaultWidth) {
+    try {
+        const payload = {
+            imageUrl: imageUrl,
+            width: width
+        };
+    
+        const resizeResponse = await fetch('https://woonft-api.yoshi.tech/api/resize-image', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload)
+        });
+    
+        if (!resizeResponse.ok) throw new Error('Failed to resize image');
+    
+        const { base64Image } = await resizeResponse.json();
+        return base64Image;
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error in minting process' });
+    }
+}
 
 async function uploadToArweave(base64Image) {
     const base64Data = base64Image.split(';base64,').pop();

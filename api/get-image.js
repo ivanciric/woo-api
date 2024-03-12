@@ -38,7 +38,10 @@ export default async (request) => {
             let width = reqBody.width ? reqBody.width : defaultWidth;
             let resizedImage = await resizeImageFromUrlToBase64(imageUrl, width);
             
-            return new Response(JSON.stringify({ image: resizedImage }), {
+            return new Response(JSON.stringify({ 
+                image: resizedImage,
+                imageUrl: imageUrl,
+            }), {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     'Content-Type': 'application/json',
@@ -62,7 +65,6 @@ export default async (request) => {
         });
     }
 };
-
 
 async function resizeImageFromUrlToBase64(imageUrl, width = defaultWidth) {
     try {
