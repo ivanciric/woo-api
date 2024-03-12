@@ -33,12 +33,8 @@ export default async (request) => {
             });
 
             let imageUrl = response.data[0].url;
-
-            if (reqBody.width) {
-                let resizedImage = await resizeImageFromUrlToBase64(imageUrl, reqBody.width);
-            } else {
-                let resizedImage = await resizeImageFromUrlToBase64(imageUrl);
-            };
+            let width = reqBody.width ? reqBody.width : 512;
+            let resizedImage = await resizeImageFromUrlToBase64(imageUrl, width);
             
             return new Response(JSON.stringify({ image: resizedImage }), {
                 headers: {
