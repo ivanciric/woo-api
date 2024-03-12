@@ -22,8 +22,8 @@ export default async (req, res) => {
 
     if (req.method === 'POST') {
         try {
-            let { image, name, description, redirectUrl, tokenId } = req.body;
-            let base64Image = await resizeImageFromUrlToBase64(image, 512);
+            let { imageUrl, name, description, redirectUrl, tokenId } = req.body;
+            let base64Image = await resizeImageFromUrlToBase64(imageUrl, 512);
             let uploadResult = await uploadToArweave(base64Image); 
             let arweaveId = uploadResult.id;
             const originUrl = new URL(redirectUrl);
