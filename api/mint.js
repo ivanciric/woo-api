@@ -1,7 +1,6 @@
 import dotenv from 'dotenv';
 import fetch from 'node-fetch';
 import FormData from 'form-data';
-import sharp from 'sharp';
 
 dotenv.config();
 const network = process.env.NETWORK;
@@ -22,9 +21,8 @@ export default async (req, res) => {
 
     if (req.method === 'POST') {
         try {
-            let { imageUrl, name, description, redirectUrl, tokenId } = req.body;
-            let imageBase64 = await resizeImageFromUrlToBase64(imageUrl);
-            let uploadResult = await uploadToArweave(imageBase64); 
+            let { image, name, description, redirectUrl, tokenId } = req.body;
+            let uploadResult = await uploadToArweave(image); 
             let arweaveId = uploadResult.id;
             const originUrl = new URL(redirectUrl);
             originUrl.searchParams.set('network', network);
@@ -39,29 +37,6 @@ export default async (req, res) => {
         res.status(405).end(`Method ${req.method} Not Allowed`);
     }
 };
-
-
-async function resizeImageFromUrlToBase64(imageUrl, width = 512) {
-    try {
-      const response = await fetch(imageUrl);
-      if (!response.ok) throw new Error(`Failed to fetch image: ${response.statusText}`);
-  
-      const imageBuffer = await response.buffer();
-  
-      const resizedImageBuffer = await sharp(imageBuffer)
-        .resize(width)
-        .toBuffer();
-  
-      const resizedImageBase64 = resizedImageBuffer.toString('base64');
-
-      return resizedImageBase64;
-
-    } catch (error) {
-      console.error('Error resizing image from URL:', error);
-      throw error;
-    }
-}
-
 
 async function uploadToArweave(base64Image) {
     const base64Data = base64Image.split(';base64,').pop();

@@ -1,6 +1,10 @@
+import dotenv from 'dotenv';
 import fetch from 'node-fetch';
 import sharp from 'sharp';
 
+dotenv.config();
+
+const defaultWidth = process.env.RESIZE_WIDTH || 256;
 export default async (req, res) => {
 
     res.setHeader('Access-Control-Allow-Origin', 'woonft-api.yoshi.tech');
@@ -9,7 +13,7 @@ export default async (req, res) => {
         return res.status(405).send('Method Not Allowed');
     }
     try {
-        const { imageUrl, width = 512 } = req.body;
+        const { imageUrl, width = defaultWidth } = req.body;
         if (width > 512) throw new Error(`Width can not be larger than 512`);
 
         const response = await fetch(imageUrl);

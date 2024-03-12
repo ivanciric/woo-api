@@ -4,6 +4,8 @@ const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY
 });
 
+const defaultWidth = process.env.RESIZE_WIDTH || 256;
+
 export const config = {
     runtime: 'experimental-edge',
 };
@@ -33,7 +35,7 @@ export default async (request) => {
             });
 
             let imageUrl = response.data[0].url;
-            let width = reqBody.width ? reqBody.width : 512;
+            let width = reqBody.width ? reqBody.width : defaultWidth;
             let resizedImage = await resizeImageFromUrlToBase64(imageUrl, width);
             
             return new Response(JSON.stringify({ image: resizedImage }), {
@@ -62,15 +64,13 @@ export default async (request) => {
 };
 
 
-async function resizeImageFromUrlToBase64(imageUrl, width = 512) {
+async function resizeImageFromUrlToBase64(imageUrl, width = defaultWidth) {
     try {
-        // Construct the payload for the resize-image endpoint
         const payload = {
             imageUrl: imageUrl,
             width: width
         };
     
-        // Call the resize-image endpoint
         const resizeResponse = await fetch('https://woonft-api.yoshi.tech/api/resize-image', {
             method: 'POST',
             headers: {
