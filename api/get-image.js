@@ -34,8 +34,12 @@ export default async (request) => {
 
             let image = response.data[0].url;
 
-            let resizedImage = await resizeImageFromUrlToBase64(image);
-
+            if (reqBody.width) {
+                image = await resizeImageFromUrlToBase64(image, reqBody.width);
+            } else {
+                let resizedImage = await resizeImageFromUrlToBase64(image);
+            };
+            
             return new Response(JSON.stringify({ imageUrl: resizedImage }), {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
@@ -67,7 +71,7 @@ async function resizeImageFromUrlToBase64(imageUrl, width = 512) {
         // Construct the payload for the resize-image endpoint
         const payload = {
             imageUrl: imageUrl,
-            width: 512
+            width: width
         };
     
         // Call the resize-image endpoint
