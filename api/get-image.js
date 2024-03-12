@@ -33,7 +33,10 @@ export default async (request) => {
             });
 
             let image = response.data[0].url;
-            return new Response(JSON.stringify({ imageUrl: image }), {
+
+            let resizedImage = await resizeImageFromUrlToBase64(image);
+
+            return new Response(JSON.stringify({ imageUrl: resizedImage }), {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     'Content-Type': 'application/json',
@@ -57,3 +60,31 @@ export default async (request) => {
         });
     }
 };
+
+
+async function resizeImageFromUrlToBase64(imageUrl, width = 512) {
+    try {
+        // Construct the payload for the resize-image endpoint
+        const payload = {
+            imageUrl: imageUrl,
+            width: 512
+        };
+    
+        // Call the resize-image endpoint
+        const resizeResponse = await fetch('https://woonft-api.yoshi.tech/api/resize-image', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload)
+        });
+    
+        if (!resizeResponse.ok) throw new Error('Failed to resize image');
+    
+        const { base64Image } = await resizeResponse.json();
+        return base64Image;
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error in minting process' });
+    }
+}
