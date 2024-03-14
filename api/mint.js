@@ -14,10 +14,13 @@ const defaultWidth = parseInt(process.env.RESIZE_WIDTH, 10) || 512;
 export default async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-License-Key');
 
     if (req.method === 'OPTIONS') {
-        return res.status(200).end();
+        return res.status(200).headers({
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Content-Type, X-License-Key',
+        }).end();
     }
 
     if (req.method === 'POST') {
@@ -26,7 +29,7 @@ export default async (req, res) => {
             const domain = origin.replace(/^(http:\/\/|https:\/\/)/, '');
             const licenseKey = req.headers.get('x-license-key') || 'xxx';
             if (!await verifyLicense(licenseKey, domain)) {
-                res.status(403).json({ error: 'Error in minting process' }).headers({
+                res.status(403).json({ error: 'Unauthorized' }).headers({
                     'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Headers': 'Content-Type, X-License-Key',
                 });
