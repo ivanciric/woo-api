@@ -26,12 +26,9 @@ export default async (req, res) => {
             const domain = origin.replace(/^(http:\/\/|https:\/\/)/, '');
             const licenseKey = req.headers.get('x-license-key') || 'xxx';
             if (!await verifyLicense(licenseKey, domain)) {
-                return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-                    status: 403,
-                    headers: {
-                        'Access-Control-Allow-Origin': '*',
-                        'Access-Control-Allow-Headers': 'Content-Type, X-License-Key',
-                    },
+                res.status(403).json({ error: 'Error in minting process' }).headers({
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Headers': 'Content-Type, X-License-Key',
                 });
             }
 
@@ -52,29 +49,6 @@ export default async (req, res) => {
         res.status(405).end(`Method ${req.method} Not Allowed`);
     }
 };
-
-async function verifyLicense(licenseKey, domain) {
-    try {
-        const response = await fetch('https://woonft-api.yoshi.tech/api/verify-license', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ licenseKey, domain })
-        });
-
-        if (!response.ok) {
-            console.error('Failed to verify license:', response.statusText);
-            return false;
-        } 
-        
-        return true;
-
-    } catch (error) {
-        console.error('Error verifying license:', error);
-        return false;
-    }
-}
 
 async function resizeImageFromUrlToBase64(imageUrl, width = defaultWidth) {
     try {
@@ -159,4 +133,27 @@ function constructSignUrl(arweaveId, name, description, redirectUrl, tokenId) {
     const mintbaseSignTransactionUrl = `${mintbaseWalletUrl}/sign-transaction?transactions_data=${encodedTransactionsData}&callback_url=${encodedCallbackUrl}`;
     
     return mintbaseSignTransactionUrl;
+}
+
+async function verifyLicense(licenseKey, domain) {
+    try {
+        const response = await fetch('https://woonft-api.yoshi.tech/api/verify-license', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ licenseKey, domain })
+        });
+
+        if (!response.ok) {
+            console.error('Failed to verify license:', response.statusText);
+            return false;
+        } 
+        
+        return true;
+
+    } catch (error) {
+        console.error('Error verifying license:', error);
+        return false;
+    }
 }
