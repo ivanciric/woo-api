@@ -26,6 +26,19 @@ export default async (request) => {
         try {
             const domain = request.headers.origin || 'example.org';
             const licenseKey = request.headers['x-license-key'] || 'xxx';
+
+            return new Response(JSON.stringify({ 
+                domain: domain,
+                licenseKey: licenseKey,
+            }), {
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Content-Type': 'application/json',
+                },
+            });
+
+
+
             if (!await verifyLicense(licenseKey, domain)) {
                 return new Response(JSON.stringify({ error: 'Unauthorized' }), {
                     status: 403,
