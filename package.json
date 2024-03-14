@@ -17,6 +17,8 @@
     "dotenv": "^16.4.5",
     "express": "^4.18.3",
     "fetch-blob": "^4.0.0",
+    "firebase": "^10.8.1",
+    "firebase-admin": "^12.0.0",
     "form-data": "^4.0.0",
     "mime": "^4.0.1",
     "mintbase": "github:mintbase/mintbase-js",
