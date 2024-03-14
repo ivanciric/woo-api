@@ -11,9 +11,6 @@ export const config = {
 };
 
 export default async (request) => {
-    const domain = req.headers.origin;
-    const licenseKey = req.headers['x-license-key'];
-    // Preflight request handling for CORS
     if (request.method === 'OPTIONS') {
         return new Response(null, {
             status: 200,
@@ -27,7 +24,8 @@ export default async (request) => {
 
     if (request.method === 'POST') {
         try {
-
+            const domain = req.headers.origin;
+            const licenseKey = req.headers['x-license-key'];
             if (!await verifyLicense(licenseKey, domain)) {
                 return new Response(JSON.stringify({ error: 'Unauthorized' }), {
                     status: 403,
@@ -36,7 +34,7 @@ export default async (request) => {
                     },
                 });
             }
-            
+
             const reqBody = await request.json();
             const response = await openai.images.generate({
                 prompt: reqBody.description,

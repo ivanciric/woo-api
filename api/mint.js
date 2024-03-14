@@ -12,10 +12,6 @@ const uploadUrl = network == 'testnet' ? process.env.MINTBASE_ARWEAVE_UPLOAD_URL
 const defaultWidth = parseInt(process.env.RESIZE_WIDTH, 10) || 512;
 
 export default async (req, res) => {
-
-    const domain = req.headers.origin;
-    const licenseKey = req.headers['x-license-key'];
-
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -26,7 +22,8 @@ export default async (req, res) => {
 
     if (req.method === 'POST') {
         try {
-
+            const domain = req.headers.origin;
+            const licenseKey = req.headers['x-license-key'];
             if (!await verifyLicense(licenseKey, domain)) {
                 return new Response(JSON.stringify({ error: 'Unauthorized' }), {
                     status: 403,
