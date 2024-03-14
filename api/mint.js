@@ -1,7 +1,6 @@
 import dotenv from 'dotenv';
 import fetch from 'node-fetch';
 import FormData from 'form-data';
-import verifyLicense from './verify-license';
 
 dotenv.config();
 const network = process.env.NETWORK;
@@ -17,10 +16,7 @@ export default async (req, res) => {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-License-Key');
 
     if (req.method === 'OPTIONS') {
-        return res.status(200).headers({
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Headers': 'Content-Type, X-License-Key',
-        }).end();
+        return res.status(200).end();
     }
 
     if (req.method === 'POST') {
@@ -29,10 +25,7 @@ export default async (req, res) => {
             const domain = origin.replace(/^(http:\/\/|https:\/\/)/, '');
             const licenseKey = req.headers.get('x-license-key') || 'xxx';
             if (!await verifyLicense(licenseKey, domain)) {
-                res.status(403).json({ error: 'Unauthorized' }).headers({
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Headers': 'Content-Type, X-License-Key',
-                });
+                res.status(403).json({ error: 'Unauthorized' });
             }
 
             let { imageUrl, name, description, redirectUrl, tokenId } = req.body;
