@@ -33,7 +33,11 @@ const firebaseConfig = {
         }
 
         const domains = doc.data().domains;
-        return res.status(200).json({ domains: domains });
+        if (domains.includes(domain)) {
+          return res.status(200).json({ message: 'Domain is authorized for this license key' });
+      } else {
+          return res.status(403).json({ error: 'Domain is not authorized for this license key' });
+      }
 
     } catch (error) {
         console.error('Error:', error);
