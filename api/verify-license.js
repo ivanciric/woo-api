@@ -23,6 +23,9 @@ const firebaseConfig = {
     }
 
     const { licenseKey, domain } = req.body;
+    if (!licenseKey || !domain) {
+        return res.status(400).json({ error: 'Missing license key or domain' });
+    }
 
     try {
         const licenseRef = db.collection('licenses').doc(licenseKey);
