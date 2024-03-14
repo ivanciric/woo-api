@@ -32,7 +32,8 @@ const firebaseConfig = {
             return res.status(404).json({ error: 'License key not found' });
         }
 
-        return res.status(200).json({ valid: true });
+        const domains = doc.data().domains;
+        return res.status(200).json({ domains: domains });
 
     } catch (error) {
         console.error('Error:', error);
