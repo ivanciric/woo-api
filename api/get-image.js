@@ -25,7 +25,7 @@ export default async (request) => {
     if (request.method === 'POST') {
         try {
             const domain = request.headers.origin || 'example.org';
-            const licenseKey = request.headers['x-license-key'] || 'xxx';
+            const licenseKey = request.headers['X-License-Key'] || 'xxx';
 
             return new Response(JSON.stringify({ 
                 domain: domain,
