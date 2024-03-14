@@ -21,9 +21,9 @@ export default async (req, res) => {
 
     if (req.method === 'POST') {
         try {
-            const origin = req.headers.get('origin') || 'example.org';
+            const origin = req.headers['origin'] || 'example.org';
             const domain = origin.replace(/^(http:\/\/|https:\/\/)/, '');
-            const licenseKey = req.headers.get('x-license-key') || 'xxx';
+            const licenseKey = req.headers['x-license-key'] || 'xxx';
             if (!await verifyLicense(licenseKey, domain)) {
                 res.status(403).json({ error: 'Unauthorized' });
             }
