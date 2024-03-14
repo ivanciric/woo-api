@@ -25,20 +25,9 @@ export default async (request) => {
     if (request.method === 'POST') {
         try {
             
-            const domain = request.headers.get('origin') || 'example.org';
+            const origin = request.headers.get('origin') || 'example.org';
+            const domain = url.replace(/^(http:\/\/|https:\/\/)/, '');
             const licenseKey = request.headers.get('x-license-key') || 'xxx';
-
-            return new Response(JSON.stringify({ 
-                domain: domain,
-                licenseKey: licenseKey,
-            }), {
-                headers: {
-                    'Access-Control-Allow-Origin': '*',
-                    'Content-Type': 'application/json',
-                },
-            });
-
-
 
             if (!await verifyLicense(licenseKey, domain)) {
                 return new Response(JSON.stringify({ error: 'Unauthorized' }), {
