@@ -26,7 +26,7 @@ export default async (request) => {
         try {
             
             const origin = request.headers.get('origin') || 'example.org';
-            const domain = url.replace(/^(http:\/\/|https:\/\/)/, '');
+            const domain = origin.replace(/^(http:\/\/|https:\/\/)/, '');
             const licenseKey = request.headers.get('x-license-key') || 'xxx';
 
             if (!await verifyLicense(licenseKey, domain)) {
