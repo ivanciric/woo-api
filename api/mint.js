@@ -22,13 +22,15 @@ export default async (req, res) => {
 
     if (req.method === 'POST') {
         try {
-            const domain = req.headers.origin;
-            const licenseKey = req.headers['x-license-key'];
+            const origin = req.headers.get('origin') || 'example.org';
+            const domain = origin.replace(/^(http:\/\/|https:\/\/)/, '');
+            const licenseKey = req.headers.get('x-license-key') || 'xxx';
             if (!await verifyLicense(licenseKey, domain)) {
                 return new Response(JSON.stringify({ error: 'Unauthorized' }), {
                     status: 403,
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Headers': 'Content-Type, X-License-Key',
                     },
                 });
             }
