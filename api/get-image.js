@@ -11,6 +11,8 @@ export const config = {
 };
 
 export default async (request) => {
+    const domain = req.headers.origin;
+    const licenseKey = req.headers['x-license-key'];
     // Preflight request handling for CORS
     if (request.method === 'OPTIONS') {
         return new Response(null, {
@@ -25,6 +27,16 @@ export default async (request) => {
 
     if (request.method === 'POST') {
         try {
+
+            if (!await verifyLicense(licenseKey, domain)) {
+                return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+                    status: 403,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+            }
+            
             const reqBody = await request.json();
             const response = await openai.images.generate({
                 prompt: reqBody.description,
@@ -88,5 +100,28 @@ async function resizeImageFromUrlToBase64(imageUrl, width = defaultWidth) {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error in minting process' });
+    }
+}
+
+async function verifyLicense(licenseKey, domain) {
+    try {
+        const response = await fetch('https://woonft-api.yoshi.tech/api/verify-license', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ licenseKey, domain })
+        });
+
+        if (!response.ok) {
+            console.error('Failed to verify license:', response.statusText);
+            return false;
+        } 
+        
+        return true;
+
+    } catch (error) {
+        console.error('Error verifying license:', error);
+        return false;
     }
 }

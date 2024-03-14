@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import fetch from 'node-fetch';
 import FormData from 'form-data';
+import verifyLicense from './verify-license';
 
 dotenv.config();
 const network = process.env.NETWORK;
@@ -12,6 +13,9 @@ const defaultWidth = parseInt(process.env.RESIZE_WIDTH, 10) || 512;
 
 export default async (req, res) => {
 
+    const domain = req.headers.origin;
+    const licenseKey = req.headers['x-license-key'];
+
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -22,6 +26,16 @@ export default async (req, res) => {
 
     if (req.method === 'POST') {
         try {
+
+            if (!await verifyLicense(licenseKey, domain)) {
+                return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+                    status: 403,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+            }
+
             let { imageUrl, name, description, redirectUrl, tokenId } = req.body;
             let base64Image = await resizeImageFromUrlToBase64(imageUrl, 512);
             let uploadResult = await uploadToArweave(base64Image); 
@@ -39,6 +53,29 @@ export default async (req, res) => {
         res.status(405).end(`Method ${req.method} Not Allowed`);
     }
 };
+
+async function verifyLicense(licenseKey, domain) {
+    try {
+        const response = await fetch('https://woonft-api.yoshi.tech/api/verify-license', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ licenseKey, domain })
+        });
+
+        if (!response.ok) {
+            console.error('Failed to verify license:', response.statusText);
+            return false;
+        } 
+        
+        return true;
+
+    } catch (error) {
+        console.error('Error verifying license:', error);
+        return false;
+    }
+}
 
 async function resizeImageFromUrlToBase64(imageUrl, width = defaultWidth) {
     try {
