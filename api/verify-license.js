@@ -1,7 +1,7 @@
-import * as admin from 'firebase-admin';
-import { initializeApp } from "firebase/app";
+const { initializeApp, applicationDefault, cert } = require('firebase-admin/app');
+const { getFirestore, Timestamp, FieldValue, Filter } = require('firebase-admin/firestore');
 
-    const app = initializeApp({
+    initializeApp({
           apiKey: process.env.FIREBASE_API_KEY,
           projectId: process.env.FIREBASE_PROJECT_ID,
           appId: process.env.FIREBASE_APP_ID,
@@ -20,7 +20,7 @@ export default async (req, res) => {
     }
 
     try {
-        const licenseRef = app.firestore().collection('licenses').doc(licenseKey);
+        const licenseRef = getFirestore().collection('licenses').doc(licenseKey);
         const doc = await licenseRef.get();
 
         if (!doc.exists) {
