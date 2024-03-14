@@ -34,7 +34,8 @@ export default async (request) => {
                     status: 403,
                     message: 'Unauthorized',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Headers': 'Content-Type, X-License-Key',
                     },
                 });
             }
