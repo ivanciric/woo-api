@@ -26,16 +26,16 @@ export default async (req, res) => {
             const licenseKey = req.headers['x-license-key'] || 'xxx';
             if (!await verifyLicense(licenseKey, domain)) {
                 res.status(403).json({ error: 'Unauthorized' });
+            } else {
+                let { imageUrl, name, description, redirectUrl, tokenId } = req.body;
+                let base64Image = await resizeImageFromUrlToBase64(imageUrl, 512);
+                let uploadResult = await uploadToArweave(base64Image); 
+                let arweaveId = uploadResult.id;
+                const originUrl = new URL(redirectUrl);
+                originUrl.searchParams.set('network', network);
+                let url = constructSignUrl(arweaveId, name, description, originUrl, tokenId); 
+                res.status(200).json({ signUrl: url });
             }
-
-            let { imageUrl, name, description, redirectUrl, tokenId } = req.body;
-            let base64Image = await resizeImageFromUrlToBase64(imageUrl, 512);
-            let uploadResult = await uploadToArweave(base64Image); 
-            let arweaveId = uploadResult.id;
-            const originUrl = new URL(redirectUrl);
-            originUrl.searchParams.set('network', network);
-            let url = constructSignUrl(arweaveId, name, description, originUrl, tokenId); 
-            res.status(200).json({ signUrl: url });
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: 'Error in minting process' });
