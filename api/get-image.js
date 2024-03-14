@@ -17,15 +17,16 @@ export default async (request) => {
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': 'POST, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type, x-license-key',
+                'Access-Control-Allow-Headers': 'Content-Type, X-License-Key',
             },
         });
     }
 
     if (request.method === 'POST') {
         try {
-            const domain = request.headers.origin || 'example.org';
-            const licenseKey = request.headers['X-License-Key'] || 'xxx';
+            
+            const domain = request.headers.get('origin') || 'example.org';
+            const licenseKey = request.headers.get('x-license-key') || 'xxx';
 
             return new Response(JSON.stringify({ 
                 domain: domain,
