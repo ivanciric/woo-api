@@ -1,6 +1,5 @@
 import * as admin from 'firebase-admin';
 
-if (!admin.apps.length) {
     admin.initializeApp({
         credential: admin.credential.cert({
           apiKey: process.env.FIREBASE_API_KEY,
@@ -8,7 +7,6 @@ if (!admin.apps.length) {
           appId: process.env.FIREBASE_APP_ID,
         }),
     });
-}
 
 export default async (req, res) => {
     if (req.method !== 'POST') {
