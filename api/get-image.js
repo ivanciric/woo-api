@@ -24,8 +24,8 @@ export default async (request) => {
 
     if (request.method === 'POST') {
         try {
-            const domain = req.headers.origin;
-            const licenseKey = req.headers['x-license-key'];
+            const domain = request.headers.origin;
+            const licenseKey = request.headers['x-license-key'];
             if (!await verifyLicense(licenseKey, domain)) {
                 return new Response(JSON.stringify({ error: 'Unauthorized' }), {
                     status: 403,
