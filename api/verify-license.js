@@ -32,7 +32,7 @@ const firebaseConfig = {
             return res.status(404).json({ error: 'License key not found' });
         }
 
-        return doc.data();
+        return res.status(200).json({ valid: true });
 
     } catch (error) {
         console.error('Error:', error);
