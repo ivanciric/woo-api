@@ -29,6 +29,7 @@ export default async (request) => {
             if (!await verifyLicense(licenseKey, domain)) {
                 return new Response(JSON.stringify({ error: 'Unauthorized' }), {
                     status: 403,
+                    message: 'Unauthorized',
                     headers: {
                         'Content-Type': 'application/json',
                     },
