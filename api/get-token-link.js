@@ -4,6 +4,9 @@ export const config = {
 
 const network = process.env.NETWORK;
 const graphQlUrl = network == 'testnet' ? process.env.MINTBASE_GRAPHQL_URL_TESTNET : process.env.MINTBASE_GRAPHQL_URL_MAINNET;
+const mintbaseUrl = network == 'testnet' ? process.env.MINTBASE_BASE_URL_TESTNET : process.env.MINTBASE_BASE_URL_MAINNET;
+
+
 
 export default async (request) => {
   if (request.method === 'OPTIONS') {
@@ -65,10 +68,23 @@ export default async (request) => {
         body: JSON.stringify(graphQuery),
       });
 
-      const data = await response.json();
-      const metadataId = data.data.nft_metadata.id;
+      const resp = await response.json();
+      var metadataId = '';
+      if (resp.data.nft_metadata && resp.data.nft_metadata.length > 0) {
+        metadataId = resp.data.nft_metadata[0].id;
+      } else {
+        return new Response(JSON.stringify({ error: 'No metadata for reference' }), {
+          status: 400,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Content-Type, X-License-Key',
+          },
+        });
+      }
 
-      return new Response(JSON.stringify({url: metadataId}), {
+      const nftUrl = mintbaseUrl + '/meta/' + metadataId;
+
+      return new Response(JSON.stringify({url: nftUrl}), {
         headers: { 'Content-Type': 'application/json' },
       });
     } catch (error) {

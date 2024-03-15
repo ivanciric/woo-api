@@ -10,6 +10,7 @@ const mintbaseWalletUrl = network == 'testnet' ? process.env.MINTBASE_WALLET_TES
 const uploadUrl = network == 'testnet' ? process.env.MINTBASE_ARWEAVE_UPLOAD_URL_TESTNET : process.env.MINTBASE_ARWEAVE_UPLOAD_URL_MAINNET;
 const defaultWidth = parseInt(process.env.RESIZE_WIDTH, 10) || 512;
 
+
 export default async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -31,11 +32,10 @@ export default async (req, res) => {
                 let base64Image = await resizeImageFromUrlToBase64(imageUrl, 512);
                 let uploadResult = await uploadToArweave(base64Image); 
                 let arweaveId = uploadResult.id;
-                let nftUrl = constructNftUrl(arweaveId);
                 const originUrl = new URL(redirectUrl);
                 originUrl.searchParams.set('network', network);
-                originUrl.searchParams.append('nftUrl', nftUrl);
-                let url = constructSignUrl(arweaveId, name, description, originUrl, tokenId, nftUrl); 
+                originUrl.searchParams.set('reference', arweaveId);
+                let url = constructSignUrl(arweaveId, name, description, originUrl, tokenId); 
                 res.status(200).json({ signUrl: url });
             }
         } catch (error) {
@@ -104,8 +104,7 @@ async function uploadToArweave(base64Image) {
       }
   }
   
-function constructSignUrl(arweaveId, name, description, redirectUrl, tokenId, nftUrl) {
-
+function constructSignUrl(arweaveId, name, description, redirectUrl, tokenId) {
     const transactionsData = [{
         receiverId: minter,
         signerId: "",
@@ -133,14 +132,7 @@ function constructSignUrl(arweaveId, name, description, redirectUrl, tokenId, nf
     return mintbaseSignTransactionUrl;
 }
 
-function constructNftUrl(arweaveId) {
-    const mintbaseBaseUrl = network == 'testnet' ? process.env.MINTBASE_BASE_URL_TESTNET : process.env.MINTBASE_BASE_URL_MAINNET;
-    const nftContract = network == 'testnet' ? process.env.NFT_CONTRACT_TESTNET : process.env.NFT_CONTRACT_MAINNET;
-    return `${mintbaseBaseUrl}/meta/${nftContract}:${arweaveId}`;
-}
-
 async function verifyLicense(licenseKey, domain) {
-    return true;
     try {
         const response = await fetch('https://woonft-api.yoshi.tech/api/verify-license', {
             method: 'POST',
