@@ -42,8 +42,9 @@ export default async (request) => {
         return new Response(JSON.stringify({ error: 'Missing reference' }), {
           status: 400,
           headers: {
-              'Access-Control-Allow-Origin': '*',
-              'Access-Control-Allow-Headers': 'Content-Type, X-License-Key',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, X-License-Key',
           },
       });
       }
@@ -77,6 +78,7 @@ export default async (request) => {
           status: 400,
           headers: {
             'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
             'Access-Control-Allow-Headers': 'Content-Type, X-License-Key',
           },
         });
@@ -93,6 +95,7 @@ export default async (request) => {
         status: 500,
         headers: {
           'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'POST, OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type, X-License-Key',
         },
       });
