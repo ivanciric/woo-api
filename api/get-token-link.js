@@ -24,17 +24,17 @@ export default async (request) => {
     try {
       const origin = request.headers.get('origin') || 'example.org';
       const domain = origin.replace(/^(http:\/\/|https:\/\/)/, '');
-      const licenseKey = request.headers.get('x-license-key') || 'xxx';
+      const licenseKey = request.headers.get('X-License-Key') || 'xxx';
 
-      // if (!await verifyLicense(licenseKey, domain)) {
-      //   return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-      //     status: 403,
-      //     headers: {
-      //       'Access-Control-Allow-Origin': '*',
-      //       'Access-Control-Allow-Headers': 'Content-Type, X-License-Key',
-      //     },
-      //   });
-      // }
+      if (!await verifyLicense(licenseKey, domain)) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 403,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Content-Type, X-License-Key',
+          },
+        });
+      }
 
       const reqBody = await request.json();
       const reference = reqBody.reference;
