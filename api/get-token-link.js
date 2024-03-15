@@ -6,8 +6,6 @@ const network = process.env.NETWORK;
 const graphQlUrl = network == 'testnet' ? process.env.MINTBASE_GRAPHQL_URL_TESTNET : process.env.MINTBASE_GRAPHQL_URL_MAINNET;
 const mintbaseUrl = network == 'testnet' ? process.env.MINTBASE_BASE_URL_TESTNET : process.env.MINTBASE_BASE_URL_MAINNET;
 
-
-
 export default async (request) => {
   if (request.method === 'OPTIONS') {
     return new Response(null, {
@@ -87,7 +85,11 @@ export default async (request) => {
       const nftUrl = mintbaseUrl + '/meta/' + metadataId;
 
       return new Response(JSON.stringify({url: nftUrl}), {
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, X-License-Key',
+         },
       });
     } catch (error) {
       console.error(error);
