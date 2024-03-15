@@ -35,7 +35,13 @@ export default async (request) => {
 
       const reference = request.body.reference;
       if (!reference) {
-        return res.status(400).json({ error: 'Missing reference' });
+        return new Response(JSON.stringify({ error: 'Missing reference' }), {
+          status: 400,
+          headers: {
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Headers': 'Content-Type, X-License-Key',
+          },
+      });
       }
       const url = graphQlUrl;
       const graphQuery = {
