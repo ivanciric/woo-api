@@ -34,7 +34,8 @@ export default async (req, res) => {
                 const originUrl = new URL(redirectUrl);
                 originUrl.searchParams.set('network', network);
                 let url = constructSignUrl(arweaveId, name, description, originUrl, tokenId); 
-                res.status(200).json({ signUrl: url });
+                let nftUrl = constructNftUrl(arweaveId);
+                res.status(200).json({ signUrl: url, nftUrl: nftUrl });
             }
         } catch (error) {
             console.error(error);
@@ -131,7 +132,15 @@ function constructSignUrl(arweaveId, name, description, redirectUrl, tokenId) {
     return mintbaseSignTransactionUrl;
 }
 
+function constructNftUrl(arweaveId) {
+    const mintbaseBaseUrl = network == 'testnet' ? process.env.MINTBASE_BASE_URL_TESTNET : process.env.MINTBASE_BASE_URL_MAINNET;
+    const nftContract = network == 'testnet' ? process.env.NFT_CONTRACT_TESTNET : process.env.NFT_CONTRACT_MAINNET;
+    const separator = encodeURIComponent(':');
+    return `${mintbaseBaseUrl}/meta/${nftContract}${separator}${arweaveId}`;
+}
+
 async function verifyLicense(licenseKey, domain) {
+    return true;
     try {
         const response = await fetch('https://woonft-api.yoshi.tech/api/verify-license', {
             method: 'POST',

@@ -66,7 +66,7 @@ export default async (request) => {
       });
 
       const data = await response.json();
-      const metadataId = data.nft_metadata.id;
+      const metadataId = data.data.nft_metadata.id;
 
       return new Response(JSON.stringify({url: metadataId}), {
         headers: { 'Content-Type': 'application/json' },
