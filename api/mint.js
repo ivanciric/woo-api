@@ -31,11 +31,12 @@ export default async (req, res) => {
                 let base64Image = await resizeImageFromUrlToBase64(imageUrl, 512);
                 let uploadResult = await uploadToArweave(base64Image); 
                 let arweaveId = uploadResult.id;
+                let nftUrl = constructNftUrl(arweaveId);
                 const originUrl = new URL(redirectUrl);
                 originUrl.searchParams.set('network', network);
-                let url = constructSignUrl(arweaveId, name, description, originUrl, tokenId); 
-                let nftUrl = constructNftUrl(arweaveId);
-                res.status(200).json({ signUrl: url, nftUrl: nftUrl });
+                originUrl.searchParams.append('nftUrl', nftUrl);
+                let url = constructSignUrl(arweaveId, name, description, originUrl, tokenId, nftUrl); 
+                res.status(200).json({ signUrl: url });
             }
         } catch (error) {
             console.error(error);
@@ -103,7 +104,7 @@ async function uploadToArweave(base64Image) {
       }
   }
   
-function constructSignUrl(arweaveId, name, description, redirectUrl, tokenId) {
+function constructSignUrl(arweaveId, name, description, redirectUrl, tokenId, nftUrl) {
 
     const transactionsData = [{
         receiverId: minter,
@@ -135,8 +136,7 @@ function constructSignUrl(arweaveId, name, description, redirectUrl, tokenId) {
 function constructNftUrl(arweaveId) {
     const mintbaseBaseUrl = network == 'testnet' ? process.env.MINTBASE_BASE_URL_TESTNET : process.env.MINTBASE_BASE_URL_MAINNET;
     const nftContract = network == 'testnet' ? process.env.NFT_CONTRACT_TESTNET : process.env.NFT_CONTRACT_MAINNET;
-    const separator = encodeURIComponent(':');
-    return `${mintbaseBaseUrl}/meta/${nftContract}${separator}${arweaveId}`;
+    return `${mintbaseBaseUrl}/meta/${nftContract}:${arweaveId}`;
 }
 
 async function verifyLicense(licenseKey, domain) {
