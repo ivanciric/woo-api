@@ -33,7 +33,8 @@ export default async (request) => {
       //   });
       // }
 
-      const reference = request.body.reference;
+      const reqBody = await request.json();
+      const reference = reqBody.reference;
       if (!reference) {
         return new Response(JSON.stringify({ error: 'Missing reference' }), {
           status: 400,
