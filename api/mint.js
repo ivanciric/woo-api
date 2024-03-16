@@ -28,7 +28,7 @@ export default async (req, res) => {
             if (!await verifyLicense(licenseKey, domain)) {
                 res.status(403).json({ error: 'Unauthorized' });
             } else {
-                let { imageUrl, name, description, redirectUrl, tokenId } = req.body;
+                let { imageUrl, name, description, redirectUrl } = req.body;
                 let base64Image = await resizeImageFromUrlToBase64(imageUrl, 512);
                 let uploadResult = await uploadToArweave(base64Image); 
                 let arweaveId = uploadResult.id;
@@ -40,7 +40,7 @@ export default async (req, res) => {
                 }
                 originUrl.searchParams.set('network', network);
                 originUrl.searchParams.set('reference', arweaveId);
-                let url = constructSignUrl(arweaveId, name, description, originUrl, tokenId); 
+                let url = constructSignUrl(arweaveId, name, description, originUrl); 
                 res.status(200).json({ signUrl: url });
             }
         } catch (error) {
@@ -109,7 +109,7 @@ async function uploadToArweave(base64Image) {
       }
   }
   
-function constructSignUrl(arweaveId, name, description, redirectUrl, tokenId) {
+function constructSignUrl(arweaveId, name, description, redirectUrl) {
     const transactionsData = [{
         receiverId: minter,
         signerId: "",
@@ -121,7 +121,6 @@ function constructSignUrl(arweaveId, name, description, redirectUrl, tokenId) {
             {
                 "metadata": `{"reference":"${arweaveId}", "title": "WooNFT Art", "description": "${description}"}`,
                 "nft_contract_id": nftContract,
-                "id": tokenId,
             },
             gas: "200000000000000",
             deposit: "10000000000000000000000"
