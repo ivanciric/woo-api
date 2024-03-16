@@ -33,6 +33,11 @@ export default async (req, res) => {
                 let uploadResult = await uploadToArweave(base64Image); 
                 let arweaveId = uploadResult.id;
                 const originUrl = new URL(redirectUrl);
+                const params = new URLSearchParams(originUrl.search);
+                if (params.has('transactionHashes')) {
+                    params.delete('transactionHashes');
+                    originUrl.search = params.toString();
+                }
                 originUrl.searchParams.set('network', network);
                 originUrl.searchParams.set('reference', arweaveId);
                 let url = constructSignUrl(arweaveId, name, description, originUrl, tokenId); 
