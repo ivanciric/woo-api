@@ -1,5 +1,4 @@
 import fetch from 'node-fetch';
-import FormData from 'formdata-polyfill/esm.min.js';
 
 const network = process.env.NETWORK;
 const nftContract = network == 'testnet' ? process.env.NFT_CONTRACT_TESTNET : process.env.NFT_CONTRACT_MAINNET;
@@ -108,10 +107,7 @@ async function uploadToArweave(base64Image) {
     const base64Data = base64Image.split(';base64,').pop();
     const buffer = Buffer.from(base64Data, 'base64');
     const formData = new FormData();
-    formData.append('media', buffer, {
-        filename: 'wooImage.png',
-        contentType: 'image/png', 
-    });
+    formData.append('media', new Blob([buffer], { type: 'image/png' }), 'wooImage.png');
 
     try {
         const response = await fetch(uploadUrl, {
