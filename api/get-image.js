@@ -1,9 +1,5 @@
 import OpenAI from "openai";
 
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
-});
-
 const defaultWidth = parseInt(process.env.RESIZE_WIDTH, 10) || 256;
 
 export const config = {
@@ -17,7 +13,7 @@ export default async (request) => {
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': 'POST, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type, X-License-Key',
+                'Access-Control-Allow-Headers': 'Content-Type, X-License-Key, x-openai-api-key',
             },
         });
     }
@@ -28,16 +24,33 @@ export default async (request) => {
             const origin = request.headers.get('origin') || 'example.org';
             const domain = origin.replace(/^(http:\/\/|https:\/\/)/, '');
             const licenseKey = request.headers.get('x-license-key') || 'xxx';
+            const openaiApiKey = request.headers.get('x-openai-api-key') || '';
 
+            if(!openaiApiKey) {
+                return new Response(JSON.stringify({ error: 'Missing OpenAI API key' }), {
+                    status: 400,
+                    headers: {
+                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+                        'Access-Control-Allow-Headers': 'Content-Type, X-License-Key, x-openai-api-key',
+                    },
+                });
+            }
+            
             if (!await verifyLicense(licenseKey, domain)) {
                 return new Response(JSON.stringify({ error: 'Unauthorized' }), {
                     status: 403,
                     headers: {
                         'Access-Control-Allow-Origin': '*',
-                        'Access-Control-Allow-Headers': 'Content-Type, X-License-Key',
+                        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+                        'Access-Control-Allow-Headers': 'Content-Type, X-License-Key, x-openai-api-key',
                     },
                 });
             }
+
+            const openai = new OpenAI({
+                apiKey: openaiApiKey
+            });
 
             const reqBody = await request.json();
             const response = await openai.images.generate({
@@ -59,6 +72,8 @@ export default async (request) => {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     'Content-Type': 'application/json',
+                    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type, X-License-Key, x-openai-api-key',
                 },
             });
         } catch (error) {
