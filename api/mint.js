@@ -115,7 +115,6 @@ async function uploadToArweave(base64Image) {
           body: formData,
           headers: {
             'Mb-Api-Key': process.env.MINTBASE_ARWEAVE_API_KEY,
-            ...formData.getHeaders()
           }
         });
     
