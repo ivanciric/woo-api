@@ -1,8 +1,6 @@
-import dotenv from 'dotenv';
 import fetch from 'node-fetch';
-import FormData from 'form-data';
+import FormData from 'formdata-polyfill/esm.min.js';
 
-dotenv.config();
 const network = process.env.NETWORK;
 const nftContract = network == 'testnet' ? process.env.NFT_CONTRACT_TESTNET : process.env.NFT_CONTRACT_MAINNET;
 const minter = network == 'testnet' ? process.env.MINTER_TESTNET : process.env.MINTER_MAINNET;
@@ -10,46 +8,74 @@ const mintbaseWalletUrl = network == 'testnet' ? process.env.MINTBASE_WALLET_TES
 const uploadUrl = network == 'testnet' ? process.env.MINTBASE_ARWEAVE_UPLOAD_URL_TESTNET : process.env.MINTBASE_ARWEAVE_UPLOAD_URL_MAINNET;
 const defaultWidth = parseInt(process.env.RESIZE_WIDTH, 10) || 512;
 
+export const config = {
+    runtime: 'experimental-edge',
+};
 
-export default async (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-License-Key');
-
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
+export default async (request) => {
+    if (request.method === 'OPTIONS') {
+        return new Response(null, {
+            status: 200,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'POST, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type, X-License-Key',
+            },
+        });
     }
 
-    if (req.method === 'POST') {
+    if (request.method === 'POST') {
         try {
-            const origin = req.headers['origin'] || 'example.org';
+            const origin = request.headers.get('origin') || 'example.org';
             const domain = origin.replace(/^(http:\/\/|https:\/\/)/, '');
-            const licenseKey = req.headers['x-license-key'] || 'xxx';
+            const licenseKey = request.headers.get('x-license-key') || 'xxx';
+
             if (!await verifyLicense(licenseKey, domain)) {
-                res.status(403).json({ error: 'Unauthorized' });
-            } else {
-                let { imageUrl, name, description, redirectUrl } = req.body;
-                let base64Image = await resizeImageFromUrlToBase64(imageUrl, 512);
-                let uploadResult = await uploadToArweave(base64Image); 
-                let arweaveId = uploadResult.id;
-                const originUrl = new URL(redirectUrl);
-                const params = new URLSearchParams(originUrl.search);
-                if (params.has('transactionHashes')) {
-                    params.delete('transactionHashes');
-                    originUrl.search = params.toString();
-                }
-                originUrl.searchParams.set('network', network);
-                originUrl.searchParams.set('reference', arweaveId);
-                let url = constructSignUrl(arweaveId, name, description, originUrl); 
-                res.status(200).json({ signUrl: url });
+                return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+                    status: 403,
+                    headers: {
+                        'Access-Control-Allow-Origin': '*',
+                    },
+                });
             }
+
+            const { imageUrl, name, description, redirectUrl } = await request.json();
+            let base64Image = await resizeImageFromUrlToBase64(imageUrl, 512);
+            let uploadResult = await uploadToArweave(base64Image); 
+            let arweaveId = uploadResult.id;
+            const originUrl = new URL(redirectUrl);
+            const params = new URLSearchParams(originUrl.search);
+            if (params.has('transactionHashes')) {
+                params.delete('transactionHashes');
+                originUrl.search = params.toString();
+            }
+            originUrl.searchParams.set('network', network);
+            originUrl.searchParams.set('reference', arweaveId);
+            let url = constructSignUrl(arweaveId, name, description, originUrl);
+
+            return new Response(JSON.stringify({ signUrl: url }), {
+                status: 200,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Content-Type': 'application/json',
+                },
+            });
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: 'Error in minting process' });
+            return new Response(JSON.stringify({ error: 'Error in minting process' }), {
+                status: 500,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
         }
     } else {
-        res.setHeader('Allow', ['POST']);
-        res.status(405).end(`Method ${req.method} Not Allowed`);
+        return new Response(`Method ${request.method} Not Allowed`, {
+            status: 405,
+            headers: {
+                'Allow': ['POST'],
+            },
+        });
     }
 };
 
