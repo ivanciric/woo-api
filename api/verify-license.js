@@ -28,6 +28,10 @@ const firebaseConfig = {
     }
 
     try {
+        if (licenseKey == process.env.TRIAL_LICENCE_KEY) {
+            return res.status(200).json({ message: 'Domain is authorized for this license key' });
+        }
+
         const licenseRef = db.collection('licenses').doc(licenseKey);
         const doc = await licenseRef.get();
 
