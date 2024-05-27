@@ -23,7 +23,7 @@ export default async (request) => {
             
             const origin = request.headers.get('origin') || 'example.org';
             const domain = origin.replace(/^(http:\/\/|https:\/\/)/, '');
-            const licenseKey = request.headers.get('x-license-key') || 'xxx';
+            const licenseKey = request.headers.get('x-license-key') || 'trial';
             const openaiApiKey = request.headers.get('x-openai-api-key') || '';
 
             if(!openaiApiKey) {
